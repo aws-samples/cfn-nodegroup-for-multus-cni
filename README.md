@@ -26,7 +26,7 @@ From the baseline CFN for self-managed node group, below functions are added;
 - Automatic-reboot after the first creation of instance, to kick in life-cycle hook to invoke Lambda for multus interface attachment. 
 
 ## Usage 
-- Before running this CloudFormation, you have to place lambda_function zip file (lambda_function.py) to your S3 bucket.
+- Before running this CloudFormation, you have to place lambda_function.zip file (compress lambda_function.py in lambda folder) to your S3 bucket.
 - During CFN stack creation
     - Select primary private subnet for the parameter of `Subets` where the primary K8s networking interface would be connected to. 
     - Select 2ndary (Multus) subnet for the parameter of `MultusSubnet1/2/3/4` where multus ENIs will be connected to.
