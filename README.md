@@ -27,9 +27,9 @@ From the baseline CFN for self-managed node group, below functions are added;
 
 ## Usage 
 - Before running this CloudFormation, you have to place lambda_function zip file (lambda_function.py) to your S3 bucket.
-- During CFN stack creation,
- -- Select primary private subnet for the parameter of `Subets` where the primary K8s networking interface would be connected to. 
- -- Select 2ndary (Multus) subnet for the parameter of `MultusSubnet1/2/3/4` where multus ENIs will be connected to.
+- During CFN stack creation
+    - Select primary private subnet for the parameter of `Subets` where the primary K8s networking interface would be connected to. 
+    - Select 2ndary (Multus) subnet for the parameter of `MultusSubnet1/2/3/4` where multus ENIs will be connected to.
  
 ## List of CFNs
 Based on required number of multus subnets, user can use different CFNs in this GitHub with same Lambda function.
