@@ -27,8 +27,10 @@ From the baseline CFN for self-managed node group, below functions are added;
 
 ## Usage 
 - Install the **multus meta-cni plugin** in your EKS.
-    `git clone https://github.com/intel/multus-cni.git`
-    `kubectl apply -f ~/multus-cni/images/multus-daemonset-pre-1.17.yml`
+    ```
+    git clone https://github.com/intel/multus-cni.git
+    kubectl apply -f ~/multus-cni/images/multus-daemonset-pre-1.17.yml
+    ```
 - Before running this CloudFormation, you have to place lambda_function.zip file (compress lambda_function.py in lambda folder) to your S3 bucket.
 - During CFN stack creation
     - Select primary private subnet for the parameter of `Subets` where the primary K8s networking interface would be connected to. 
