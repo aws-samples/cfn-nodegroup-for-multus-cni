@@ -26,10 +26,51 @@ From the baseline CFN for self-managed node group, below functions are added;
 - Automatic-reboot after the first creation of instance, to kick in life-cycle hook to invoke Lambda for multus interface attachment. 
 
 ## Usage 
+- Install the **multus meta-cni plugin** in your EKS.
+    `git clone https://github.com/intel/multus-cni.git`
+    `kubectl apply -f ~/multus-cni/images/multus-daemonset-pre-1.17.yml`
 - Before running this CloudFormation, you have to place lambda_function.zip file (compress lambda_function.py in lambda folder) to your S3 bucket.
 - During CFN stack creation
     - Select primary private subnet for the parameter of `Subets` where the primary K8s networking interface would be connected to. 
     - Select 2ndary (Multus) subnet for the parameter of `MultusSubnet1/2/3/4` where multus ENIs will be connected to.
+- After completion of stack creation, update aws-auth-cn.yaml with Node Role ARN in Output section of the CloudFormation result, to make workernodes to join the your EKS cluster. 
+- Once all workernodes come up with multiple ENIs as intended (please make it sure each multus subnet ENI has to be with "no_manage" tag) and also workernodes successfully join to your EKS cluster, then you can deploy an application that is with multus-cni network definition in following steps. 
+    - NetworkAttachmentDefinition [example].
+    ```
+    apiVersion: "k8s.cni.cncf.io/v1"
+    kind: NetworkAttachmentDefinition
+    metadata:
+      name: ipvlan-conf
+    spec:
+      config: '{
+          "cniVersion": "0.3.0",
+          "type": "ipvlan",
+          "master": "eth1",
+          "mode": "l3",
+          "ipam": {
+            "type": "host-local",
+            "subnet": "10.0.100.0/24",
+            "rangeStart": "10.0.100.71",
+            "rangeEnd": "10.0.100.72",
+            "gateway": "10.0.100.1"
+          }
+        }'
+     ```
+     - Create an app with using this NetworkAttachmentDefinition (using ipvlan) [example].
+     ```
+     apiVersion: v1
+     kind: Pod
+     metadata:
+       name: samplepod
+       annotations:
+           k8s.v1.cni.cncf.io/networks: ipvlan-conf
+     spec:
+       containers:
+       - name: samplepod
+         command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
+         image: nginx
+     ```
+     - In this example, we have to configure `10.0.100.71/24` as the secondary IP or multus ENI for the VPC network, or app conatiner can configure this IP address to multus ENI through API call (please refer to the example python code for this at `samplecode/IpUpdateFromPod.py`).  
  
 ## List of CFNs
 Based on required number of multus subnets, user can use different CFNs in this GitHub with same Lambda function.
