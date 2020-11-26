@@ -11,20 +11,22 @@ def lambda_handler(event, context):
     instance_id = event['detail']['EC2InstanceId']
     LifecycleHookName=event['detail']['LifecycleHookName']
     AutoScalingGroupName=event['detail']['AutoScalingGroupName']
-    subnetEnvs = [os.environ['SubnetId1'], os.environ['SubnetId2'], os.environ['SubnetId3'], os.environ['SubnetId4']]
-    secgroup_id = os.environ['SecGroupId']
-    subnetids = []
+    secgroup_ids = []
+    subnet_ids = []
 
-    for n in range (4):
-        if subnetEnvs[n] != "":
-            subnetids.append(subnetEnvs[n])
-        else:
-            break
+    count = 0
+    while True:
+      try:
+        subnet_ids.append(os.environ['SubnetId' + str(count + 1)])
+        secgroup_ids.append(os.environ['SecGroupId' + str(count + 1)])
+        count = count + 1
+      except KeyError:
+        break
 
     if event["detail-type"] == "EC2 Instance-launch Lifecycle Action":
         index = 1
-        for x in subnetids:
-            interface_id = create_interface(x,secgroup_id)
+        for x in subnet_ids:
+            interface_id = create_interface(x,secgroup_ids[index - 1])
             attachment = attach_interface(interface_id,instance_id,index)
             index = index+1
             if not interface_id:
@@ -40,35 +42,9 @@ def lambda_handler(event, context):
         interface_ids = []
         attachment_ids = []
 
-        # -* K8s draining function should be added here -*#
+        # -* K8s draining function should be added here- TBD -*#
 
         complete_lifecycle_action_success(LifecycleHookName,AutoScalingGroupName,instance_id)
-
-def detach_interface(attachment_id):
-    try:
-        ec2_client.detach_network_interface(
-            AttachmentId=attachment_id,
-            DryRun=False,
-            Force=True
-        )
-        log("Detach network interface: {}".format(attachment_id))
-        return True
-    except botocore.exceptions.ClientError as e:
-        log("Error detaching interface {}: {}".format(attachment_id,e.response['Error']))
-
-
-
-def get_subnet_id(instance_id):
-    try:
-        result = ec2_client.describe_instances(InstanceIds=[instance_id])
-        vpc_subnet_id = result['Reservations'][0]['Instances'][0]['SubnetId']
-        log("Subnet id: {}".format(vpc_subnet_id))
-
-    except botocore.exceptions.ClientError as e:
-        log("Error describing the instance {}: {}".format(instance_id,\
-        e.response['Error']))
-        vpc_subnet_id = None
-    return vpc_subnet_id
 
 
 def create_interface(subnet_id,sg_id):
