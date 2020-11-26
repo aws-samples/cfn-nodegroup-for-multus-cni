@@ -78,5 +78,5 @@ From the baseline CFN for self-managed node group, below functions are added;
  
 ## About CloudFormation Templates in Template folder
 Based on required number of multus subnets, user can use base CFN with putting multiple Multus Subnet options such as MultusSubnet1, MultusSubnet2.. and MultusSecurityGroup1, MultusSecurityGroup2...].
-- amazon-eks-nodegroup-multus-1ENI.yaml : 1 multus subnet (1 default k8s network and 1 additional multus network)
-- amazon-eks-nodegroup-multus-4ENIs.yaml : 4 multus subnets
+- amazon-eks-nodegroup-multus-1ENI.yaml : base template with 1 multus subnet (1 default k8s network and 1 additional multus network)
+- amazon-eks-nodegroup-multus-4ENIs.yaml : example for 4 multus subnets
