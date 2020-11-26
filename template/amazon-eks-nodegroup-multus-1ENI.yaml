@@ -39,7 +39,7 @@ Metadata:
           default: Multus CNI Configuration
         Parameters:
           - MultusSubnet1
-          - MultusSecurityGroupId
+          - MultusSecurityGroupId1
           - LambdaS3Bucket
           - LambdaS3Key
 
@@ -87,7 +87,7 @@ Parameters:
 
   NodeImageIdSSMParam:
     Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
-    Default: /aws/service/eks/optimized-ami/1.16/amazon-linux-2/recommended/image_id
+    Default: /aws/service/eks/optimized-ami/1.18/amazon-linux-2/recommended/image_id
     Description: AWS Systems Manager Parameter Store parameter of the AMI ID for the worker node instances.
 
   NodeInstanceType:
@@ -364,7 +364,7 @@ Parameters:
     Type: "AWS::EC2::Subnet::Id"
     Description: The subnet where multus 2ndary ENI will be connected to.
 
-  MultusSecurityGroupId:
+  MultusSecurityGroupId1:
     Type: "AWS::EC2::SecurityGroup::Id"
     Description: The combined security group of the Multus Network Interfaces. Select one from the list.
 
@@ -647,10 +647,7 @@ Resources:
       Environment:
         Variables:
           SubnetId1: !Ref MultusSubnet1
-          SubnetId2: ''
-          SubnetId3: ''
-          SubnetId4: ''
-          SecGroupId: !Ref MultusSecurityGroupId
+          SecGroupId1: !Ref MultusSecurityGroupId1
 # End of Lambda
 
 # CloudWatch Event Trigger

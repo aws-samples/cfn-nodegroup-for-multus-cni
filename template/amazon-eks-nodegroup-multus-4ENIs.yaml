@@ -42,7 +42,10 @@ Metadata:
           - MultusSubnet2
           - MultusSubnet3
           - MultusSubnet4
-          - MultusSecurityGroupId
+          - MultusSecurityGroupId1
+          - MultusSecurityGroupId2
+          - MultusSecurityGroupId3
+          - MultusSecurityGroupId4
           - LambdaS3Bucket
           - LambdaS3Key
 
@@ -379,7 +382,19 @@ Parameters:
     Type: "AWS::EC2::Subnet::Id"
     Description: The subnet2 where multus 2ndary ENI will be connected to.
 
-  MultusSecurityGroupId:
+  MultusSecurityGroupId1:
+    Type: "AWS::EC2::SecurityGroup::Id"
+    Description: The combined security group of the Multus Network Interfaces. Select one from the list.
+
+  MultusSecurityGroupId2:
+    Type: "AWS::EC2::SecurityGroup::Id"
+    Description: The combined security group of the Multus Network Interfaces. Select one from the list.
+
+  MultusSecurityGroupId3:
+    Type: "AWS::EC2::SecurityGroup::Id"
+    Description: The combined security group of the Multus Network Interfaces. Select one from the list.
+
+  MultusSecurityGroupId4:
     Type: "AWS::EC2::SecurityGroup::Id"
     Description: The combined security group of the Multus Network Interfaces. Select one from the list.
 
@@ -657,7 +672,10 @@ Resources:
           SubnetId2: !Ref MultusSubnet2
           SubnetId3: !Ref MultusSubnet3
           SubnetId4: !Ref MultusSubnet4
-          SecGroupId: !Ref MultusSecurityGroupId
+          SecGroupId1: !Ref MultusSecurityGroupId1
+          SecGroupId2: !Ref MultusSecurityGroupId2
+          SecGroupId3: !Ref MultusSecurityGroupId3
+          SecGroupId4: !Ref MultusSecurityGroupId4
 # End of Lambda
 
 # CloudWatch Event Trigger
