@@ -38,15 +38,15 @@ Metadata:
       - Label:
           default: Multus CNI Configuration
         Parameters:
-          - MultusSubnet1
-          - MultusSecurityGroupId1
+          - MultusSubnets
+          - MultusSecurityGroupIds
           - LambdaS3Bucket
           - LambdaS3Key
 
 Parameters:
   BootstrapArguments:
     Type: String
-    Default: ""
+    Default: "--kubelet-extra-args '--node-labels=is_worker=true'"
     Description: "Arguments to pass to the bootstrap script. See files/bootstrap.sh in https://github.com/awslabs/amazon-eks-ami"
 
   ClusterControlPlaneSecurityGroup:
@@ -87,12 +87,12 @@ Parameters:
 
   NodeImageIdSSMParam:
     Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
-    Default: /aws/service/eks/optimized-ami/1.18/amazon-linux-2/recommended/image_id
+    Default: /aws/service/eks/optimized-ami/1.19/amazon-linux-2/recommended/image_id
     Description: AWS Systems Manager Parameter Store parameter of the AMI ID for the worker node instances.
 
   NodeInstanceType:
     Type: String
-    Default: t3.medium
+    Default: c5.large
     AllowedValues:
       - a1.medium
       - a1.large
@@ -360,14 +360,13 @@ Parameters:
     Type: "List<AWS::EC2::Subnet::Id>"
     Description: The subnets where workers can be created.
 
-  MultusSubnet1:
-    Type: "AWS::EC2::Subnet::Id"
-    Description: The subnet where multus 2ndary ENI will be connected to.
+  MultusSubnets:
+    Type: "List<AWS::EC2::Subnet::Id>"
+    Description: The List of Multus subnets from where multus 2ndary ENI will be connected to.
 
-  MultusSecurityGroupId1:
-    Type: "AWS::EC2::SecurityGroup::Id"
-    Description: The combined security group of the Multus Network Interfaces. Select one from the list.
-
+  MultusSecurityGroupIds:
+    Type: "List<AWS::EC2::SecurityGroup::Id>"
+    Description: The security groups of the Multus Network Interfaces. Along with the order of security group selection, each will be assigned to each MultusSubnet in above list. If number of security group doesn't match with number of multus subnets, then the 1st security group will be used for all multus subnets.
   VpcId:
     Type: "AWS::EC2::VPC::Id"
     Description: The VPC of the worker instances
@@ -614,6 +613,7 @@ Resources:
                 "ec2:DescribeInstances",
                 "ec2:DetachNetworkInterface",
                 "ec2:ModifyNetworkInterfaceAttribute",
+                "ec2:DescribeSubnets",
                 "autoscaling:CompleteLifecycleAction",
                 "ec2:DeleteTags",
                 "ec2:DescribeNetworkInterfaces",
@@ -646,8 +646,8 @@ Resources:
       Timeout: "60"
       Environment:
         Variables:
-          SubnetId1: !Ref MultusSubnet1
-          SecGroupId1: !Ref MultusSecurityGroupId1
+          SubnetIds: !Join [ ",", !Ref MultusSubnets ]
+          SecGroupIds:  !Join [ ",", !Ref MultusSecurityGroupIds ]
 # End of Lambda
 
 # CloudWatch Event Trigger
