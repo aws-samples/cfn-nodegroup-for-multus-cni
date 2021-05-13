@@ -79,6 +79,6 @@ From the baseline CFN for self-managed node group, below functions are added;
          command: ["/bin/bash", "-c", "trap : TERM INT; sleep infinity & wait"]
          image: nginx
      ```
-     - In this example, we have to configure `10.0.100.71/24` as the secondary IP or multus ENI for the VPC network, or app conatiner can configure this IP address to multus ENI through API call (please refer to the example python code for this at `samplecode/IpUpdateFromPod.py`).
+     - In this example, we have to configure `10.0.100.71/24` as the secondary IP of the multus ENI for the VPC networking. For this additional step app conatiner can configure this IP address to multus ENI through API call (please refer to the example python code for this at `samplecode/IpUpdateFromPod.py`). This step can be integrated and automated using init-container or sidecar of the container. 
      - **Note** If the application requires DPDK interface for the multus interface, then we can use **host-device CNI plugin** instead of ipvlan CNI plugin. 
  
