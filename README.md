@@ -26,7 +26,7 @@ This library is licensed under the MIT-0 License. See the LICENSE file.
 ## Behind the scene
 From the baseline CFN for self-managed node group, below functions are added;
 - LifeCycle Hook creation for the self-managed workernode ASG.
-- Lambda function creation for multus ENI attachment of 2ndary subnet (using the code (in zip file) pre-uploaded in S3). The lambda function supports multus subnets as many as defined in the CFN template with MultusSubnet1, MultusSubnet2,... (as well as MultusSecurityGroup1, MultusSecurityGroup2...). While attaching multus interfaces to the instance, also it adds "no_manage" tag to these interfaces so that these would not be controlled by VPC CNI Plugin. 
+- Lambda function creation for multus ENI attachment of 2ndary subnet (using the code (in zip file) pre-uploaded in S3). The lambda function supports multus subnets as many as defined in the CFN template with MultusSubnets list (as well as MultusSecurityGroupIds list). While attaching multus interfaces to the instance, also it adds "no_manage" tag to these interfaces so that these would not be controlled by VPC CNI Plugin. 
     - Number of additional Multus ENIs can be limited by the size of instance. (please refer to https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html for more detail).
 - CloudWatch Event Rule to trigger Lambda function. 
 - Automatic-reboot after the first creation of instance (only after the first creation of Autoscaling group), to kick in life-cycle hook to invoke Lambda for multus interface attachment. 
