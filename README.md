@@ -82,6 +82,3 @@ From the baseline CFN for self-managed node group, below functions are added;
      - In this example, we have to configure `10.0.100.71/24` as the secondary IP or multus ENI for the VPC network, or app conatiner can configure this IP address to multus ENI through API call (please refer to the example python code for this at `samplecode/IpUpdateFromPod.py`).
      - **Note** If the application requires DPDK interface for the multus interface, then we can use **host-device CNI plugin** instead of ipvlan CNI plugin. 
  
-## About CloudFormation Templates in Template folder
-Based on required number of multus subnets, user can use base CFN with putting multiple Multus Subnets option as the list format in the CloudFormation input parameter.
-- amazon-eks-nodegroup-multus.yaml : base template with multus subnet list
