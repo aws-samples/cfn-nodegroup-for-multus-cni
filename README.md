@@ -13,9 +13,9 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 This library is licensed under the MIT-0 License. See the LICENSE file.
 
 ## Update
-- May.2021: 
--- CFN and Lambda updated to have flexible input number of Multus Subnets and Security Group. (list of subnets/security-groups)
--- IPv6 support for multus subnets (VPC and target multus subnet should be enabled with IPv6 assignment in advance)
+- May. 2021
+    - CFN and Lambda updated to have flexible input number of Multus Subnets and Security Group. (list of subnets/security-groups)
+    - IPv6 support for multus subnets (VPC and target multus subnet should be enabled with IPv6 assignment in advance)
 
 
 ## Pre-requisites
