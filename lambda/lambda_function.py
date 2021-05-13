@@ -1,6 +1,6 @@
 import boto3
 import botocore
-import os
+import os,sys
 from datetime import datetime
 
 ec2_client = boto3.client('ec2')
@@ -11,22 +11,35 @@ def lambda_handler(event, context):
     instance_id = event['detail']['EC2InstanceId']
     LifecycleHookName=event['detail']['LifecycleHookName']
     AutoScalingGroupName=event['detail']['AutoScalingGroupName']
-    secgroup_ids = []
-    subnet_ids = []
 
-    count = 0
-    while True:
-      try:
-        subnet_ids.append(os.environ['SubnetId' + str(count + 1)])
-        secgroup_ids.append(os.environ['SecGroupId' + str(count + 1)])
-        count = count + 1
-      except KeyError:
-        break
+    if os.environ['SecGroupIds'] :
+        secgroup_ids = os.environ['SecGroupIds'].split(",")
+    else:
+        log("Empty Environment variable SecGroupIds:"+ os.environ['SecGroupIds'])
+        exit (1)
+    if os.environ['SubnetIds'] :
+        subnet_ids = os.environ['SubnetIds'].split(",")
+    else:
+        log("Empty Environment variable SubnetIds:"+ os.environ['SubnetIds'])
+        exit (1)
+    log("subnet-ids:"+str(subnet_ids))
+    log("secgroup-ids:" + str(secgroup_ids))
+    #if only 1 securitygroup is passed then use the same secgroup with all multus, fill the array
+    if len(secgroup_ids) != len(subnet_ids):
+        if len(secgroup_ids) == 1:
+            index=1
+            while index < len(subnet_ids) :
+                secgroup_ids.append(secgroup_ids[index-1])
+                index = index +1
+        else:
+            log("length of SecGroupIds :"+ len(secgroup_ids)  + "  not same as length of subnets "+ len(subnet_ids) )
+            exit (1)
+
 
     if event["detail-type"] == "EC2 Instance-launch Lifecycle Action":
         index = 1
         for x in subnet_ids:
-            interface_id = create_interface(x,secgroup_ids[index - 1])
+            interface_id = create_interface(x,secgroup_ids[index-1])
             attachment = attach_interface(interface_id,instance_id,index)
             index = index+1
             if not interface_id:
@@ -42,16 +55,38 @@ def lambda_handler(event, context):
         interface_ids = []
         attachment_ids = []
 
-        # -* K8s draining function should be added here- TBD -*#
+        # -* K8s draining function should be added here -*#
 
         complete_lifecycle_action_success(LifecycleHookName,AutoScalingGroupName,instance_id)
 
+def isIPv6(subnet_id):
+    ipv6=False
+
+    try:
+        response = ec2_client.describe_subnets(
+            SubnetIds=[
+                subnet_id,
+            ],
+        )
+
+        for i in response['Subnets']:
+           if i['Ipv6CidrBlockAssociationSet']:
+                ipv6=True
+    except botocore.exceptions.ClientError as e:
+        log("Error describing subnet : {}".format(e.response['Error']))
+    return ipv6
 
 def create_interface(subnet_id,sg_id):
     network_interface_id = None
+    print("create_interface subnet:" + subnet_id +" secgroup:" + sg_id)
+    log("create_interface: {}".format(network_interface_id))
+
     if subnet_id:
         try:
-            network_interface = ec2_client.create_network_interface(Groups=[sg_id],SubnetId=subnet_id)
+            if isIPv6(subnet_id) == True:
+                network_interface = ec2_client.create_network_interface(Groups=[sg_id],SubnetId=subnet_id, Ipv6AddressCount=1)
+            else :
+                network_interface = ec2_client.create_network_interface(Groups=[sg_id],SubnetId=subnet_id)
             network_interface_id = network_interface['NetworkInterface']['NetworkInterfaceId']
             log("Created network interface: {}".format(network_interface_id))
         except botocore.exceptions.ClientError as e:
