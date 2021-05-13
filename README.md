@@ -12,9 +12,14 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
 
+## Update
+- May.2021: 
+-- CFN and Lambda updated to have flexible input number of Multus Subnets and Security Group. (list of subnets/security-groups)
+-- IPv6 support for multus subnets (VPC and target multus subnet should be enabled with IPv6 assignment in advance)
+
+
 ## Pre-requisites
-- This CFN assumes user already has created VPC, security groups and subnets (even for subnets of multus interfaces). 
-- Current Lambda supports maximum 4 additional multus subnets (besides with a default K8s network). But user can modify to increase the number of multus interfaces. 
+- This CFN assumes user already has created VPC, security groups and subnets for multus required networks (e.g. OAM, Signaling, Userplane). 
 - **[Important Note]** User must be aware of and responsible of that using this CFN and this mode of multus will cause the number of pods hosted on the workernode to be reduced down because this mode is dedicating certain number of ENIs only for Multus subnet purpose. 
 (In general, a number of max Pods on the node has tight dependancy to the number of ENIs available for VPC CNI plugin.)
 
@@ -32,10 +37,11 @@ From the baseline CFN for self-managed node group, below functions are added;
     git clone https://github.com/intel/multus-cni.git
     kubectl apply -f ~/multus-cni/images/multus-daemonset-pre.yml
     ```
-- Before running this CloudFormation, you have to place lambda_function.zip file (compress lambda_function.py in lambda folder) to your S3 bucket.
+- Before running this CloudFormation, you have to place lambda_function.zip file (compress lambda_function.py to zip file in this github lambda folder) to your S3 bucket.
 - During CFN stack creation
-    - Select primary private subnet for the parameter of `Subets` where the primary K8s networking interface would be connected to. 
-    - Select 2ndary (Multus) subnet for the parameter of `MultusSubnet1/2/3/4..` where multus ENIs will be connected to.
+    - Select primary private subnet(s) for the parameter of `Subets` where the primary K8s networking interface would be connected to. 
+    - Select Multus subnet(s) for the parameter of `MultusSubnets` where multus ENIs will be connected to, as the list of subnets.
+    - Select security group for multus subnet(s). If each multus subnet requires each own security group, then please select same number of security groups with the number of multus subnets in same order. If the number of security group doesn't match with the number of multus subnets, then the first security group will be used for all multus subnets commonly.
 - After completion of stack creation, update aws-auth-cn.yaml with Node Role ARN in Output section of the CloudFormation result, to make workernodes to join the your EKS cluster. 
 - Once all workernodes come up with multiple ENIs as intended (please make it sure each multus subnet ENI has to be with "no_manage" tag) and also workernodes successfully join to your EKS cluster, then you can deploy an application that is with multus-cni network definition in following steps. 
     - NetworkAttachmentDefinition [example].
@@ -77,6 +83,5 @@ From the baseline CFN for self-managed node group, below functions are added;
      - **Note** If the application requires DPDK interface for the multus interface, then we can use **host-device CNI plugin** instead of ipvlan CNI plugin. 
  
 ## About CloudFormation Templates in Template folder
-Based on required number of multus subnets, user can use base CFN with putting multiple Multus Subnet options such as MultusSubnet1, MultusSubnet2.. and MultusSecurityGroup1, MultusSecurityGroup2...].
-- amazon-eks-nodegroup-multus-1ENI.yaml : base template with 1 multus subnet (1 default k8s network and 1 additional multus network)
-- amazon-eks-nodegroup-multus-4ENIs.yaml : example for 4 multus subnets
+Based on required number of multus subnets, user can use base CFN with putting multiple Multus Subnets option as the list format in the CloudFormation input parameter.
+- amazon-eks-nodegroup-multus.yaml : base template with multus subnet list
