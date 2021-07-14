@@ -95,6 +95,17 @@ def create_interface(subnet_id,sg_id):
 
 
 def attach_interface(network_interface_id, instance_id, index):
+    # Tag creation first before attachment for compatibility to VPC CNI 1.7.5
+    network_interface = ec2.NetworkInterface(network_interface_id)
+    network_interface.create_tags(
+        Tags=[
+                {
+                    'Key': 'node.k8s.amazonaws.com/no_manage',
+                    'Value': 'true'
+            }
+        ]
+    )
+
     attachment = None
     if network_interface_id and instance_id:
         try:
@@ -107,16 +118,6 @@ def attach_interface(network_interface_id, instance_id, index):
             log("Created network attachment: {}".format(attachment))
         except botocore.exceptions.ClientError as e:
             log("Error attaching network interface: {}".format(e.response['Error']))
-
-    network_interface = ec2.NetworkInterface(network_interface_id)
-    network_interface.create_tags(
-        Tags=[
-                {
-                    'Key': 'node.k8s.amazonaws.com/no_manage',
-                    'Value': 'true'
-            }
-        ]
-    )
 
     #modify_attribute doesn't allow multiple parameter change at once..
     network_interface.modify_attribute(
