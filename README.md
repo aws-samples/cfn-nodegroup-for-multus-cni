@@ -1,7 +1,7 @@
 
 **----------------------------------------------------------------------------------------------------------------**
 
-**[Important Note]**
+**[Important Notice]**
 
 **This GitHub will be deprecated soon as AWS announced official support of Multus (Aug.2021)**. 
 **Please refer to the link, https://aws.amazon.com/blogs/containers/amazon-eks-now-supports-multus-cni/**
