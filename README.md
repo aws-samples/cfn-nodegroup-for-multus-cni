@@ -4,7 +4,10 @@
 **[Important Notice]**
 
 **This GitHub will be deprecated soon as AWS announced official support of Multus (Aug.2021)**. 
-**Please refer to the link, https://aws.amazon.com/blogs/containers/amazon-eks-now-supports-multus-cni/**
+**Please refer to links,** 
+https://aws.amazon.com/blogs/containers/amazon-eks-now-supports-multus-cni/
+https://docs.aws.amazon.com/eks/latest/userguide/pod-multiple-network-interfaces.html
+https://github.com/aws-samples/eks-install-guide-for-multus/blob/main/README.md
 **----------------------------------------------------------------------------------------------------------------**
 
 
