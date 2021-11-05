@@ -72,12 +72,15 @@ From the baseline CFN for self-managed node group, below functions are added;
           "cniVersion": "0.3.0",
           "type": "ipvlan",
           "master": "eth1",
-          "mode": "l3",
+          "mode": "l2",
           "ipam": {
             "type": "host-local",
             "subnet": "10.0.100.0/24",
             "rangeStart": "10.0.100.71",
             "rangeEnd": "10.0.100.72",
+            "routes": [
+              { "dst": "10.1.0.0/16" }
+            ],
             "gateway": "10.0.100.1"
           }
         }'
