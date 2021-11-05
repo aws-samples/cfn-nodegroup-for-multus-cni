@@ -51,8 +51,7 @@ From the baseline CFN for self-managed node group, below functions are added;
 ## Usage 
 - Install the **multus meta-cni plugin** in your EKS.
     ```
-    git clone https://github.com/intel/multus-cni.git
-    kubectl apply -f ~/multus-cni/images/multus-daemonset-pre.yml
+    kubectl apply -f https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/master/config/multus/v3.7.2-eksbuild.1/aws-k8s-multus.yaml
     ```
 - Before running this CloudFormation, you have to place lambda_function.zip file (compress lambda_function.py to zip file in this github lambda folder) to your S3 bucket.
 - During CFN stack creation
