@@ -573,7 +573,7 @@ Resources:
     Properties:
       AutoScalingGroupName: !Ref NodeGroup
       LifecycleTransition: "autoscaling:EC2_INSTANCE_LAUNCHING"
-      DefaultResult: "ABANDON"
+      DefaultResult: "CONTINUE"
       HeartbeatTimeout: "300"
   LchookEc2Term:
     Type: "AWS::AutoScaling::LifecycleHook"
