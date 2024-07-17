@@ -43,12 +43,16 @@ This library is licensed under the MIT-0 License. See the LICENSE file.
 (In general, a number of max Pods on the node has tight dependancy to the number of ENIs available for VPC CNI plugin.)
 
 ## Behind the scene
+The initial Lambda based CFN worked in below way;
+````
 From the baseline CFN for self-managed node group, below functions are added;
 - LifeCycle Hook creation for the self-managed workernode ASG.
 - Lambda function creation for multus ENI attachment of 2ndary subnet (using the code (in zip file) pre-uploaded in S3). The lambda function supports multus subnets as many as defined in the CFN template with MultusSubnets list (as well as MultusSecurityGroupIds list). While attaching multus interfaces to the instance, also it adds "no_manage" tag to these interfaces so that these would not be controlled by VPC CNI Plugin. 
     - Number of additional Multus ENIs can be limited by the size of instance. (please refer to https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html for more detail).
 - CloudWatch Event Rule to trigger Lambda function. 
 - Automatic-reboot after the first creation of instance (only after the first creation of Autoscaling group), to kick in life-cycle hook to invoke Lambda for multus interface attachment. 
+````
+But now, CFN updated to use only userData (API to be called inside of userData), which gives more straighforward and simple process than Lambda approach (this doesn't require initial-reboot event any further, which saves time to complete NG creation). 
 
 ## Usage 
 - Install the **multus meta-cni plugin** in your EKS.
