@@ -3,13 +3,15 @@
 
 **[Important Notice]**
 
-**This GitHub will be deprecated soon as AWS announced official support of Multus (Aug.2021)**. 
-**Please refer to links,** 
+[Aug.2021] There comes official site for Multus guide.
 https://aws.amazon.com/blogs/containers/amazon-eks-now-supports-multus-cni/
-
 https://docs.aws.amazon.com/eks/latest/userguide/pod-multiple-network-interfaces.html
-
 https://github.com/aws-samples/eks-install-guide-for-multus/blob/main/README.md
+
+[July.2024] A new CFN template updates in the repo
+. a new way to use userData to attach ENIs instead of using Lambda (refer to https://github.com/aws-samples/cfn-multus-eks-managed-ng.
+. a new template for AL2023 added (AL2023 requires additional nodeadm config). 
+
 **----------------------------------------------------------------------------------------------------------------**
 
 
