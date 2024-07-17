@@ -34,7 +34,7 @@ This library is licensed under the MIT-0 License. See the LICENSE file.
 
 - July.2024 (new CFN templates updated in the repo).
     - LaunchConfig is now updated to use LaunchTemplate.
-    - A new way to use userData to attach ENIs instead of using Lambda (refer to https://github.com/aws-samples/cfn-multus-eks-managed-ng
+    - A new way to use userData to attach ENIs instead of using Lambda (refer to https://github.com/aws-samples/cfn-multus-eks-managed-ng )
     - A new template for AL2023 added (AL2023 requires additional nodeadm config).
 
 ## Pre-requisites
