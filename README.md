@@ -3,14 +3,10 @@
 
 **[Important Notice]**
 
-[Aug.2021] There comes official site for Multus guide.
+[Aug.2021] Please also erfer to official guiding references.
 * https://aws.amazon.com/blogs/containers/amazon-eks-now-supports-multus-cni/
 * https://docs.aws.amazon.com/eks/latest/userguide/pod-multiple-network-interfaces.html
 * https://github.com/aws-samples/eks-install-guide-for-multus/blob/main/README.md
-
-[July.2024] A new CFN templates updated in the repo.
-* a new way to use userData to attach ENIs instead of using Lambda (refer to https://github.com/aws-samples/cfn-multus-eks-managed-ng
-* a new template for AL2023 added (AL2023 requires additional nodeadm config).
 
 **----------------------------------------------------------------------------------------------------------------**
 
@@ -36,6 +32,10 @@ This library is licensed under the MIT-0 License. See the LICENSE file.
     - CFN and Lambda updated to have flexible input number of Multus Subnets and Security Group. (list of subnets/security-groups)
     - IPv6 support for multus subnets (VPC and target multus subnet should be enabled with IPv6 assignment in advance)
 
+- July.2024 A new CFN templates updated in the repo.
+    - LaunchConfig is now updated to use LaunchTemplate.
+    - A new way to use userData to attach ENIs instead of using Lambda (refer to https://github.com/aws-samples/cfn-multus-eks-managed-ng
+    - A new template for AL2023 added (AL2023 requires additional nodeadm config).
 
 ## Pre-requisites
 - This CFN assumes user already has created VPC, security groups and subnets for multus required networks (e.g. OAM, Signaling, Userplane). 
