@@ -28,11 +28,11 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 This library is licensed under the MIT-0 License. See the LICENSE file.
 
 ## Update
-- May. 2021
+- May. 2021 (major change in Lambda for IPv6 support).
     - CFN and Lambda updated to have flexible input number of Multus Subnets and Security Group. (list of subnets/security-groups)
     - IPv6 support for multus subnets (VPC and target multus subnet should be enabled with IPv6 assignment in advance)
 
-- July.2024 A new CFN templates updated in the repo.
+- July.2024 (new CFN templates updated in the repo).
     - LaunchConfig is now updated to use LaunchTemplate.
     - A new way to use userData to attach ENIs instead of using Lambda (refer to https://github.com/aws-samples/cfn-multus-eks-managed-ng
     - A new template for AL2023 added (AL2023 requires additional nodeadm config).
