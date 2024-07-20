@@ -394,10 +394,9 @@ Resources:
                     fi
 
                     ### Attach the multus interface to EC2 worker, adjust device-index incrementally for every new attachment
-                    attachmentResult=$(aws ec2 attach-network-interface --network-interface-id ${!multusId} \
-                    --instance-id `curl -s http://169.254.169.254/latest/meta-data/instance-id` \
-                    --output text --device-index $((n+1 )) )
-                    IFS=' ' read -ra attachmentId <<< $attachmentResult
+                    attachmentId=$(aws ec2 attach-network-interface --network-interface-id ${!multusId} \
+                    --instance-id `curl -s http://169.254.169.254/latest/meta-data/instance-id` --device-index $((n+1 )) |jq -r '.AttachmentId')
+                    #IFS=' ' read -ra attachmentId <<< $attachmentResult
                     aws ec2 modify-network-interface-attribute --network-interface-id ${!multusId} --no-source-dest-check
                     aws ec2 modify-network-interface-attribute --attachment "AttachmentId"=${!attachmentId},"DeleteOnTermination"="True" \
                     --network-interface-id ${!multusId}
@@ -406,17 +405,21 @@ Resources:
                 echo "net.ipv4.conf.default.rp_filter = 0" | tee -a /etc/sysctl.conf
                 echo "net.ipv4.conf.all.rp_filter = 0" | tee -a /etc/sysctl.conf
                 sudo sysctl -p
+                echo "#!/usr/bin/env bash" > /etc/pm/power.d/node-init-script.sh
                 ls /sys/class/net/ > /tmp/ethList;cat /tmp/ethList |while read line ; do sudo ifconfig $line up; done
-                grep eth /tmp/ethList |while read line ; do echo "ifconfig $line up" >> /etc/rc.d/rc.local; done
-                systemctl enable rc-local
-                chmod +x /etc/rc.d/rc.local
-
-                # For kubelet arg input
-                cat << EOF > /etc/systemd/system/kubelet.service.d/90-kubelet-extra-args.conf
+                grep ens /tmp/ethList |while read line ; do echo "ifconfig $line up" >> /etc/pm/power.d/node-init-script.sh; done
+                chmod +x /etc/pm/power.d/node-init-script.sh
+                cat << EOF > /etc/systemd/system/node-init-script.service
+                [Unit]
+                Description=Run node-init-script
+                After=cloud-init.service
                 [Service]
-                Environment='USERDATA_EXTRA_ARGS=${KubeletExtraArguments}'
+                ExecStart=/etc/pm/power.d/node-init-script.sh
+                [Install]
+                WantedBy=network-online.target
                 EOF
-                sed -i 's/KUBELET_EXTRA_ARGS/KUBELET_EXTRA_ARGS $USERDATA_EXTRA_ARGS/' /etc/eks/containerd/kubelet-containerd.service
+                systemctl enable node-init-script.service
+
                 --//--
               - SubnetIds: !Join [ " ", !Ref MultusSubnets ]
                 SecGrpIds: !Join [ " ", !Ref MultusSecurityGroupIds ]
