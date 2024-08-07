@@ -306,6 +306,7 @@ Resources:
     Type: "AWS::EC2::LaunchTemplate"
     Properties:
       LaunchTemplateData:
+        DisableApiTermination: true
         BlockDeviceMappings:
           - DeviceName: /dev/xvda
             Ebs:
